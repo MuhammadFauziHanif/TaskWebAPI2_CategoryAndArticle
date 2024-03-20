@@ -1,6 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MyRESTServices.Data.Interfaces;
 using MyRESTServices.Domain.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MyRESTServices.Data
 {
@@ -12,50 +16,143 @@ namespace MyRESTServices.Data
             _context = context;
         }
 
-        public Task<bool> Delete(int id)
+        public async Task<bool> Delete(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var category = await _context.Categories.FindAsync(id);
+                if (category == null)
+                    return false;
+
+                _context.Categories.Remove(category);
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+      
+                throw new Exception("Error deleting category", ex);
+            }
         }
 
         public async Task<IEnumerable<Category>> GetAll()
         {
-            var categories = await _context.Categories.OrderBy(c => c.CategoryName).ToListAsync();
-            return categories;
+            try
+            {
+                var categories = await _context.Categories.OrderBy(c => c.CategoryName).ToListAsync();
+                return categories;
+            }
+            catch (Exception ex)
+            {
+      
+                throw new Exception("Error getting all categories", ex);
+            }
         }
 
-        public Task<Category> GetById(int id)
+        public async Task<Category> GetById(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await _context.Categories.FirstOrDefaultAsync(c => c.CategoryId == id);
+            }
+            catch (Exception ex)
+            {
+      
+                throw new Exception("Error getting category by ID", ex);
+            }
         }
 
-        public Task<IEnumerable<Category>> GetByName(string name)
+        public async Task<IEnumerable<Category>> GetByName(string name)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await _context.Categories.Where(c => c.CategoryName.Contains(name)).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+      
+                throw new Exception("Error getting categories by name", ex);
+            }
         }
 
-        public Task<int> GetCountCategories(string name)
+        public async Task<int> GetCountCategories(string name)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await _context.Categories.CountAsync(c => c.CategoryName.Contains(name));
+            }
+            catch (Exception ex)
+            {
+      
+                throw new Exception("Error getting count of categories", ex);
+            }
         }
 
-        public Task<IEnumerable<Category>> GetWithPaging(int pageNumber, int pageSize, string name)
+        public async Task<IEnumerable<Category>> GetWithPaging(int pageNumber, int pageSize, string name)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var categories = await _context.Categories
+                    .Where(c => c.CategoryName.Contains(name))
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+                return categories;
+            }
+            catch (Exception ex)
+            {
+      
+                throw new Exception("Error getting categories with paging", ex);
+            }
         }
 
-        public Task<Category> Insert(Category entity)
+        public async Task<Category> Insert(Category entity)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _context.Categories.Add(entity);
+                await _context.SaveChangesAsync();
+                return entity;
+            }
+            catch (Exception ex)
+            {
+      
+                throw new Exception("Error inserting category", ex);
+            }
         }
 
-        public Task<int> InsertWithIdentity(Category category)
+        public async Task<int> InsertWithIdentity(Category category)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _context.Categories.Add(category);
+                await _context.SaveChangesAsync();
+                return category.CategoryId;
+            }
+            catch (Exception ex)
+            {
+      
+                throw new Exception("Error inserting category with identity", ex);
+            }
         }
 
-        public Task<Category> Update(int id, Category entity)
+        public async Task<Category> Update(int id, Category entity)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var existingCategory = await _context.Categories.FindAsync(id);
+                if (existingCategory == null)
+                    return null;
+
+                existingCategory.CategoryName = entity.CategoryName; 
+                await _context.SaveChangesAsync();
+                return existingCategory;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error updating category", ex);
+            }
         }
     }
 }

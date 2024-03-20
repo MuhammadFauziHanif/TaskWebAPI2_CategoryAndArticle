@@ -8,25 +8,25 @@ namespace MyRESTServices.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
-    public class CategoriesController : ControllerBase
+    public class ArticlesController : ControllerBase
     {
-        private readonly ICategoryBLL _categoryBLL;
-        public CategoriesController(ICategoryBLL categoryBLL)
+        private readonly IArticleBLL _articleBLL;
+        public ArticlesController(IArticleBLL articleBLL)
         {
-            _categoryBLL = categoryBLL;
+            _articleBLL = articleBLL;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<CategoryDTO>> Get()
+        public async Task<IEnumerable<ArticleDTO>> Get()
         {
-            var results = await _categoryBLL.GetAll();
+            var results = await _articleBLL.GetAll();
             return results;
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            var result = await _categoryBLL.GetById(id);
+            var result = await _articleBLL.GetArticleById(id);
             if (result == null)
             {
                 return NotFound();
@@ -35,16 +35,16 @@ namespace MyRESTServices.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(CategoryCreateDTO categoryCreateDTO)
+        public async Task<IActionResult> Post(ArticleCreateDTO articleCreateDTO)
         {
-            if (categoryCreateDTO == null)
+            if (articleCreateDTO == null)
             {
                 return BadRequest();
             }
 
             try
             {
-                await _categoryBLL.Insert(categoryCreateDTO);
+                await _articleBLL.Insert(articleCreateDTO);
                 return Ok("Insert data success");
             }
             catch (Exception ex)
@@ -54,17 +54,17 @@ namespace MyRESTServices.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, CategoryUpdateDTO categoryUpdateDTO)
+        public async Task<IActionResult> Put(int id, ArticleUpdateDTO articleUpdateDTO)
         {
-            if (await _categoryBLL.GetById(id) == null)
+            if (await _articleBLL.GetArticleById(id) == null)
             {
                 return NotFound();
             }
 
             try
             {
-                var category = await _categoryBLL.Update(id, categoryUpdateDTO);
-                return Ok(category);
+                var article = await _articleBLL.Update(id, articleUpdateDTO);
+                return Ok(article);
             }
             catch (Exception ex)
             {
@@ -75,14 +75,14 @@ namespace MyRESTServices.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            if (await _categoryBLL.GetById(id) == null)
+            if (await _articleBLL.GetArticleById(id) == null)
             {
                 return NotFound();
             }
 
             try
             {
-                await _categoryBLL.Delete(id);
+                await _articleBLL.Delete(id);
                 return Ok("Delete data success");
             }
             catch (Exception ex)
